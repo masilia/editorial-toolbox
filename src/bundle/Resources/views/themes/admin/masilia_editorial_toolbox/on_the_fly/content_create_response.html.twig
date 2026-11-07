@@ -1,0 +1,15 @@
+{% extends '@ibexadesign/ui/on_the_fly/response.html.twig' %}
+
+{% block meta %}
+    {{ parent() }}
+    <meta name="ContentID" content="{{ contentId ?? '' }}" />
+    <script>
+        (function() {
+            if (window.parent && window.parent !== window) {
+                var contentIdMeta = document.querySelector('meta[name="ContentID"]');
+                var contentId = contentIdMeta ? parseInt(contentIdMeta.content, 10) : null;
+                window.parent.postMessage({ event: 'ibexa:content-create:success', contentId: contentId }, '*');
+            }
+        })();
+    </script>
+{% endblock %}

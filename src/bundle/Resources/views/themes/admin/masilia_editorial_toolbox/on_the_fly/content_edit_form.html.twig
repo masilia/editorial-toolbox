@@ -1,0 +1,55 @@
+{% extends '@ibexadesign/ui/on_the_fly/edit_on_the_fly.html.twig' %}
+
+{% block form_fields %}
+    {{ parent() }}
+    {{ form_widget(form.publish, {'attr': {'hidden': 'hidden', 'data-action': 'publish'}}) }}
+    {% if form.publishAndEdit is defined %}{{ form_widget(form.publishAndEdit, { attr: { hidden: 'hidden' }}) }}{% endif %}
+    {% if form.saveDraft is defined %}{{ form_widget(form.saveDraft, {'attr': {'hidden': 'hidden'}}) }}{% endif %}
+    {% if form.saveDraftAndClose is defined %}{{ form_widget(form.saveDraftAndClose, { attr: { hidden: 'hidden' }}) }}{% endif %}
+    {% if form.cancel is defined %}{{ form_widget(form.cancel, {'attr': {'hidden': 'hidden'}}) }}{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style id="atb-fs-style">
+        body.atb-fs-active .ibexa-edit-content__container {
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        body.atb-fs-active .ibexa-main-container__side-column {
+            display: none !important;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        (function() {
+            var confirmBtn = document.querySelector('.ibexa-context-menu .ibexa-btn--confirm');
+            var publishBtn = document.querySelector('[data-action="publish"]');
+            var cancelBtn = document.querySelector('.ibexa-context-menu .ibexa-btn--cancel');
+            var closeBtn = document.querySelector('.ibexa-anchor-navigation-menu__close');
+
+            if (confirmBtn && publishBtn) {
+                confirmBtn.addEventListener('click', function() {
+                    publishBtn.click();
+                });
+            }
+
+            if (window.parent && window.parent !== window) {
+                function notifyCancel() {
+                    window.parent.postMessage('ibexa:content-edit:cancel', '*');
+                }
+                if (cancelBtn) cancelBtn.addEventListener('click', notifyCancel);
+                if (closeBtn) closeBtn.addEventListener('click', notifyCancel);
+
+                window.addEventListener('message', function (event) {
+                    var data = event.data || {};
+                    if (data.event !== 'atb:fs') return;
+                    document.body.classList.toggle('atb-fs-active', !!data.fullscreen);
+                });
+            }
+        })();
+    </script>
+{% endblock %}

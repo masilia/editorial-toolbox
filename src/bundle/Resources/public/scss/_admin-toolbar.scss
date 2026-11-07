@@ -1,0 +1,718 @@
+// ============================================================
+// Admin Toolbar — Floating vertical sidebar (Ibexa BO style)
+// ============================================================
+
+// ── Design tokens extracted from Ibexa BO ────────────────
+$atb-sidebar-w: 52px;
+$atb-sidebar-w-expanded: 220px;
+$atb-bg: #1b1f3b;
+$atb-bg-hover: #252a4a;
+$atb-accent: #ae1164;
+$atb-accent-hover: #c81a73;
+$atb-accent-secondary: #f15a22;
+$atb-text: #c4c9d4;
+$atb-text-bright: #ffffff;
+$atb-muted: #6b7280;
+$atb-border: rgba(255, 255, 255, 0.06);
+$atb-outline-color: rgba(174, 17, 100, 0.65);
+$atb-badge-bg: #1b1f3b;
+$atb-badge-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+$atb-radius: 12px;
+$atb-font: 'Inter', 'Source Sans 3', system-ui, sans-serif;
+$atb-top-offset: 16px;
+$atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ── Sidebar container ────────────────────────────────────
+.admin-toolbar {
+    position: fixed;
+    top: $atb-top-offset;
+    left: 12px;
+    z-index: 99999;
+    width: $atb-sidebar-w;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 0;
+    background: $atb-bg;
+    border: 1px solid $atb-border;
+    border-radius: $atb-radius;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.04);
+    font-family: $atb-font;
+    color: $atb-text;
+    transition: width $atb-transition, border-radius $atb-transition;
+    overflow: visible;
+    backdrop-filter: blur(12px);
+
+    &--expanded {
+        width: $atb-sidebar-w-expanded;
+        border-radius: $atb-radius;
+
+        .admin-toolbar__btn-text {
+            opacity: 1;
+            max-width: 160px;
+        }
+
+        .admin-toolbar__label,
+        .admin-toolbar__env-label {
+            opacity: 1;
+            width: auto;
+            margin-left: 0;
+        }
+    }
+
+    &--active {
+        border-color: rgba($atb-accent, 0.35);
+    }
+}
+
+// ── Brand / logo area ────────────────────────────────────
+.admin-toolbar__brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 6px 0 10px;
+    border-bottom: 1px solid $atb-border;
+    margin-bottom: 4px;
+    cursor: pointer;
+    gap: 8px;
+    transition: background $atb-transition;
+
+    &:hover {
+        background: $atb-bg-hover;
+    }
+
+    .admin-toolbar__icon {
+        font-size: 18px;
+        color: $atb-accent;
+        width: $atb-sidebar-w;
+        text-align: center;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+
+    .admin-toolbar__label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: $atb-muted;
+        white-space: nowrap;
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+        transition: opacity $atb-transition, width $atb-transition;
+    }
+}
+
+// ── Actions (vertical icon buttons) ──────────────────────
+.admin-toolbar__actions {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 2px;
+    flex: 1;
+    overflow: visible;
+}
+
+.admin-toolbar__btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    height: 42px;
+    border: none;
+    background: transparent;
+    color: $atb-text;
+    font-size: 12px;
+    font-family: $atb-font;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background $atb-transition, color 0.15s;
+    gap: 0;
+    overflow: visible;
+
+    i[class*="fa-"],
+    .admin-toolbar__btn-icon {
+        font-size: 16px;
+        width: $atb-sidebar-w;
+        text-align: center;
+        flex-shrink: 0;
+        line-height: 1;
+        transition: color 0.15s;
+    }
+
+    .admin-toolbar__btn-text {
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        max-width: 0;
+        overflow: hidden;
+        transition: opacity $atb-transition, max-width $atb-transition;
+    }
+
+    &:hover {
+        background: $atb-bg-hover;
+        color: $atb-text-bright;
+    }
+
+    // Danger / destructive action (e.g. logout)
+    &--danger {
+        color: #f87171;
+
+        &:hover {
+            background: rgba(#ef4444, 0.12);
+            color: #fca5a5;
+        }
+    }
+
+    // Active state indicator (left bar like Ibexa BO)
+    &--on {
+        color: $atb-text-bright;
+        background: rgba($atb-accent, 0.12);
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: $atb-accent;
+        }
+
+        &:hover {
+            background: rgba($atb-accent, 0.2);
+        }
+    }
+}
+
+// ── Separator ────────────────────────────────────────────
+.admin-toolbar__separator {
+    width: 70%;
+    height: 1px;
+    background: $atb-border;
+    margin: 4px auto;
+}
+
+// ── Environment badge ────────────────────────────────────
+.admin-toolbar__env {
+    width: 100%;
+    padding: 8px 0 4px;
+    border-top: 1px solid $atb-border;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.admin-toolbar__env-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba($atb-accent, 0.15);
+    border: 1px solid rgba($atb-accent, 0.3);
+    color: $atb-accent;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.admin-toolbar__env-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $atb-muted;
+    white-space: nowrap;
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transition: opacity $atb-transition, width $atb-transition;
+}
+
+// ── Expand / collapse toggle button ─────────────────────
+.admin-toolbar__toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 32px;
+    border: none;
+    border-top: 1px solid $atb-border;
+    background: transparent;
+    color: $atb-muted;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background $atb-transition, color 0.15s;
+    margin-top: 2px;
+
+    i[class*="fa-"] {
+        font-size: 11px;
+        transition: color 0.15s;
+    }
+
+    &:hover {
+        background: $atb-bg-hover;
+        color: $atb-text-bright;
+    }
+
+    .atb-tip {
+        left: calc(#{$atb-sidebar-w} + 12px);
+    }
+}
+
+// ── Block outline mode ───────────────────────────────────
+.atb-block--outlined {
+    outline: 2px dashed $atb-outline-color !important;
+    outline-offset: -2px;
+    cursor: pointer;
+    position: relative;
+    transition: outline-color 0.15s;
+
+    &::before {
+        content: attr(data-admin-type);
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        background: $atb-accent;
+        color: $atb-text-bright;
+        font-family: $atb-font;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        padding: 3px 8px;
+        border-radius: 4px;
+        z-index: 9998;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(-2px);
+        transition: opacity 0.15s, transform 0.15s;
+    }
+
+    &:hover {
+        outline-color: $atb-accent;
+
+        &::before {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+// ── Block info badge (popover) ───────────────────────────
+.atb-badge {
+    position: absolute;
+    z-index: 99998;
+    width: 300px;
+    background: $atb-badge-bg;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: $atb-radius;
+    box-shadow: $atb-badge-shadow;
+    font-family: $atb-font;
+    color: $atb-text;
+    overflow: hidden;
+    animation: atb-badge-in 0.2s ease-out;
+}
+
+@keyframes atb-badge-in {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.atb-badge__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid $atb-border;
+    background: rgba($atb-accent, 0.1);
+}
+
+.atb-badge__type {
+    font-size: 12px;
+    font-weight: 700;
+    color: lighten($atb-accent, 25%);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.atb-badge__close {
+    background: none;
+    border: none;
+    color: $atb-muted;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: color 0.15s;
+
+    &:hover { color: $atb-text-bright; }
+}
+
+.atb-badge__body {
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.atb-badge__meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 12px;
+    margin: 0;
+    color: $atb-muted;
+
+    span:first-child {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: rgba(255, 255, 255, 0.3);
+        min-width: 48px;
+    }
+
+    &.atb-badge__remote {
+        font-size: 10px;
+        word-break: break-all;
+    }
+}
+
+.atb-badge__actions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid $atb-border;
+}
+
+.atb-badge__btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.1s;
+    border: none;
+
+    i[class*="fa-"] {
+        font-size: 12px;
+    }
+
+    &:active {
+        transform: scale(0.97);
+    }
+
+    &--edit {
+        background: $atb-accent;
+        color: $atb-text-bright;
+
+        &:hover { background: $atb-accent-hover; color: $atb-text-bright; }
+    }
+
+    &--view {
+        background: rgba(255, 255, 255, 0.06);
+        color: $atb-text;
+        border: 1px solid $atb-border;
+
+        &:hover { background: rgba(255, 255, 255, 0.12); color: $atb-text-bright; }
+    }
+}
+
+// ── Page-level outline variant ───────────────────────────
+[data-admin-page].atb-block--outlined {
+    outline-color: #059669;
+
+    &::before { background: #059669; }
+}
+
+// ── Tooltip for collapsed icons ──────────────────────────
+//   Rendered via React <span class="atb-tip"> inside each button
+.atb-tip {
+    position: absolute;
+    left: calc(#{$atb-sidebar-w} + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-6px);
+    background: #0d1020;
+    color: $atb-text-bright;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: $atb-font;
+    letter-spacing: 0.03em;
+    padding: 5px 12px;
+    border-radius: 7px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 100001;
+    box-shadow: -3px 0 0 0 $atb-accent, 0 6px 20px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+
+    // Left-pointing caret
+    &::before {
+        content: '';
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 5px solid transparent;
+        border-right-color: $atb-accent;
+    }
+}
+
+.admin-toolbar__btn:hover .atb-tip,
+.admin-toolbar__brand:hover .atb-tip,
+.admin-toolbar__toggle:hover .atb-tip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+// Hide tooltips when sidebar is expanded (label text is visible)
+// Exception: keep toggle button tooltip visible always
+.admin-toolbar--expanded .admin-toolbar__btn .atb-tip,
+.admin-toolbar--expanded .admin-toolbar__brand .atb-tip {
+    display: none;
+}
+
+// ── Block count indicator ────────────────────────────────
+.admin-toolbar__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background: $atb-accent;
+    color: $atb-text-bright;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0 4px;
+    margin-left: auto;
+    margin-right: 12px;
+}
+
+// ── Mobile: hide sidebar below 768px ─────────────────────
+@media (max-width: 767px) {
+    .admin-toolbar {
+        top: auto;
+        bottom: 12px;
+        left: 12px;
+        width: 44px;
+        border-radius: 22px;
+        padding: 6px 0;
+
+        .admin-toolbar__brand {
+            display: none;
+        }
+
+        .admin-toolbar__separator {
+            display: none;
+        }
+
+        .admin-toolbar__env {
+            display: none;
+        }
+
+        .admin-toolbar__btn {
+            height: 36px;
+
+            i[class*="fa-"],
+            .admin-toolbar__btn-icon {
+                width: 44px;
+                font-size: 14px;
+            }
+        }
+    }
+}
+
+// ============================================================
+// In-Context Editor Modal (COTF iframe popup)
+// ============================================================
+
+.atb-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(11, 15, 30, 0.55);
+    backdrop-filter: blur(10px) saturate(1.2);
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    animation: atb-modal-fade-in 0.25s ease-out;
+}
+
+@keyframes atb-modal-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.atb-modal-container {
+    width: 92vw;
+    max-width: 1280px;
+    height: 88vh;
+    display: flex;
+    flex-direction: column;
+    background: $atb-bg;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    animation: atb-modal-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes atb-modal-slide-in {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.atb-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid $atb-border;
+    background: rgba($atb-accent, 0.06);
+    flex-shrink: 0;
+}
+
+.atb-modal-title {
+    font-family: $atb-font;
+    font-size: 14px;
+    font-weight: 700;
+    color: $atb-text-bright;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+        content: '';
+        display: block;
+        width: 3px;
+        height: 16px;
+        border-radius: 2px;
+        background: $atb-accent;
+    }
+}
+
+.atb-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    color: $atb-muted;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    &:hover {
+        background: rgba(#ef4444, 0.12);
+        border-color: rgba(#ef4444, 0.25);
+        color: #f87171;
+    }
+}
+
+.atb-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.atb-modal-fs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    color: $atb-muted;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    &:hover {
+        background: rgba($atb-accent, 0.12);
+        border-color: rgba($atb-accent, 0.25);
+        color: $atb-accent;
+    }
+}
+
+.atb-modal-container--fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    border-radius: 0;
+    border: none;
+}
+
+.atb-modal-body {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.atb-modal-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+}
+
+.atb-modal-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-family: $atb-font;
+    font-size: 14px;
+    font-weight: 500;
+    color: $atb-muted;
+    background: $atb-bg;
+
+    i.fa-spinner {
+        font-size: 24px;
+        color: $atb-accent;
+    }
+}
+
+// ── Modal responsive adjustments ─────────────────────────
+@media (max-width: 767px) {
+    .atb-modal-container {
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        border-radius: 0;
+    }
+}
+

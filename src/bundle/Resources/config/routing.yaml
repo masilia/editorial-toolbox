@@ -1,0 +1,56 @@
+# Import with the prefix of your choice, e.g.
+#   masilia_editorial_toolbox:
+#       resource: '@MasiliaEditorialToolboxBundle/Resources/config/routing.yaml'
+#       prefix: /admin/api
+masilia_editorial_toolbox.csrf:
+    path: /csrf-token
+    controller: Masilia\Bundle\EditorialToolbox\Controller\CsrfTokenController::token
+    methods: [GET]
+
+masilia_editorial_toolbox.draft.edit:
+    path: /in-context/edit/{contentId}/{languageCode}/{locationId}
+    controller: Masilia\Bundle\EditorialToolbox\Controller\DraftController::edit
+    methods: [POST]
+    requirements: { contentId: '\d+', locationId: '\d+' }
+
+masilia_editorial_toolbox.draft.discard:
+    path: /in-context/discard/{contentId}/{languageCode}
+    controller: Masilia\Bundle\EditorialToolbox\Controller\DraftController::discard
+    methods: [DELETE]
+    requirements: { contentId: '\d+' }
+
+masilia_editorial_toolbox.blocks.list:
+    path: /page/{locationId}/blocks
+    controller: Masilia\Bundle\EditorialToolbox\Controller\PageBlocksController::list
+    methods: [GET]
+    requirements: { locationId: '\d+' }
+
+masilia_editorial_toolbox.blocks.create:
+    path: /page/{locationId}/blocks
+    controller: Masilia\Bundle\EditorialToolbox\Controller\PageBlocksController::create
+    methods: [POST]
+    requirements: { locationId: '\d+' }
+
+masilia_editorial_toolbox.blocks.relation:
+    path: /page/{locationId}/blocks/relation
+    controller: Masilia\Bundle\EditorialToolbox\Controller\PageBlocksController::addRelation
+    methods: [POST]
+    requirements: { locationId: '\d+' }
+
+masilia_editorial_toolbox.blocks.reorder:
+    path: /page/{locationId}/blocks/order
+    controller: Masilia\Bundle\EditorialToolbox\Controller\PageBlocksController::reorder
+    methods: [PATCH]
+    requirements: { locationId: '\d+' }
+
+masilia_editorial_toolbox.blocks.draft.discard:
+    path: /page/{locationId}/blocks/{blockContentId}/draft
+    controller: Masilia\Bundle\EditorialToolbox\Controller\PageBlocksController::discardDraft
+    methods: [DELETE]
+    requirements: { locationId: '\d+', blockContentId: '\d+' }
+
+masilia_editorial_toolbox.blocks.remove:
+    path: /page/{locationId}/blocks/{blockContentId}
+    controller: Masilia\Bundle\EditorialToolbox\Controller\PageBlocksController::remove
+    methods: [DELETE]
+    requirements: { locationId: '\d+', blockContentId: '\d+' }

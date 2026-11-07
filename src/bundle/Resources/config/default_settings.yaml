@@ -1,0 +1,3 @@
+parameters:
+    masilia_editorial_toolbox.default.blocks_field: blocks
+    masilia_editorial_toolbox.default.admin_siteaccess: admin
