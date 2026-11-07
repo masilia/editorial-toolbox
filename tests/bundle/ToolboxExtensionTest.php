@@ -44,4 +44,41 @@ final class ToolboxExtensionTest extends TestCase
             'block' => '/admin/api/page/{locationId}/blocks/{blockContentId}',
         ], $config['endpoints']);
     }
+
+    public function testAttributesPrintNothingWithoutMeta(): void
+    {
+        $extension = $this->extension();
+
+        self::assertSame('', $extension->attributes([]));
+        self::assertSame('', $extension->attributes(['admin_meta' => null]));
+        self::assertSame('', $extension->attributes(['admin_meta' => []]));
+    }
+
+    public function testAttributesEscapeTheJsonForADoubleQuotedAttribute(): void
+    {
+        $meta = ['content_id' => 64, 'content_type' => 'Bloc "Héro" <b> & co', 'dashboard_url' => 'http://admin.example/dashboard'];
+
+        $attribute = $this->extension()->attributes(['admin_meta' => $meta]);
+
+        self::assertStringStartsWith(' data-admin="', $attribute);
+        self::assertStringEndsWith('"', $attribute);
+        // Nothing that could close the attribute or open a tag survives.
+        $value = substr($attribute, \strlen(' data-admin="'), -1);
+        self::assertStringNotContainsString('"', $value);
+        self::assertStringNotContainsString('<', $value);
+        // ...and a browser decoding the attribute gets the original JSON back.
+        self::assertSame($meta, json_decode(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), true));
+    }
+
+    public function testAnExplicitMetaWinsOverTheContext(): void
+    {
+        $attribute = $this->extension()->attributes(['admin_meta' => ['content_id' => 1]], ['content_id' => 2]);
+
+        self::assertStringContainsString('content_id&quot;:2', $attribute);
+    }
+
+    private function extension(): ToolboxExtension
+    {
+        return new ToolboxExtension($this->createMock(UrlGeneratorInterface::class), $this->createMock(TranslatorInterface::class));
+    }
 }

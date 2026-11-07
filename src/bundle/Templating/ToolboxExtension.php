@@ -31,7 +31,35 @@ class ToolboxExtension extends AbstractExtension
     {
         return [
             new TwigFunction('masilia_editorial_toolbox', [$this, 'render'], ['needs_environment' => true, 'is_safe' => ['html']]),
+            new TwigFunction('masilia_editorial_attrs', [$this, 'attributes'], ['needs_context' => true, 'is_safe' => ['html']]),
         ];
+    }
+
+    /**
+     * `<section{{ masilia_editorial_attrs() }} class="...">` marks an element as editable by the toolbar.
+     *
+     * Prints ` data-admin="{...}"` from the `admin_meta` template variable (set for users who may edit, see
+     * AdminMetaViewListener) or from the array given, and nothing for everybody else. The JSON is HTML-escaped,
+     * so it is safe in a double-quoted attribute; the toolbar reads it back with `JSON.parse(el.dataset.admin)`.
+     *
+     * @param array<string, mixed>      $context
+     * @param array<string, mixed>|null $meta
+     */
+    public function attributes(array $context, ?array $meta = null): string
+    {
+        $meta ??= $context['admin_meta'] ?? null;
+
+        if (!\is_array($meta) || $meta === []) {
+            return '';
+        }
+
+        try {
+            $json = json_encode($meta, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        } catch (\JsonException) {
+            return '';
+        }
+
+        return ' data-admin="' . htmlspecialchars($json, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
     }
 
     public function render(Environment $twig): string
