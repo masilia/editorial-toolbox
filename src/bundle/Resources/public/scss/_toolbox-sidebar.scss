@@ -183,7 +183,8 @@ $_tsb-danger-hover: #dc2626;
 // ── Block palette (2-column Grid) ───────────────────────
 .atb-block-palette {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
+    // minmax(0, 1fr), not 1fr: a column may shrink below its content, long labels are ellipsized instead of widening the grid
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 6px !important;
     overflow: hidden !important;
     transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
@@ -197,6 +198,7 @@ $_tsb-danger-hover: #dc2626;
 }
 
 .atb-palette-item {
+    min-width: 0 !important;
     padding: 8px 8px !important;
     background: $_tsb-bg-card !important;
     border: 1px solid $_tsb-border !important;

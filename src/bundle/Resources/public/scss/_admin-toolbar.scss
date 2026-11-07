@@ -22,6 +22,41 @@ $atb-font: 'Inter', 'Source Sans 3', system-ui, sans-serif;
 $atb-top-offset: 16px;
 $atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
+// ── Isolation from the host page ─────────────────────────
+// The toolbox is rendered inside the host's own page, so the host's CSS applies to it. It must not depend on the
+// host's choices: a theme without a global `box-sizing: border-box` (content-box is the browser default) made every
+// padded element wider than its box and pushed the block palette out of the sidebar.
+.js-island-admin-toolbar,
+.js-island-admin-toolbar *,
+.js-island-admin-toolbar *::before,
+.js-island-admin-toolbar *::after {
+    box-sizing: border-box !important;
+}
+
+// ── Icons (inline SVG, see components/Icon.jsx) ──────────
+// Size comes from the surrounding font-size; contextual rules below may set a wider box (the glyph stays centered).
+.js-island-admin-toolbar .atb-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -0.125em;
+    overflow: visible;
+}
+
+.js-island-admin-toolbar .atb-icon--spin {
+    animation: atb-icon-spin 0.9s linear infinite;
+}
+
+@keyframes atb-icon-spin {
+    to { transform: rotate(360deg); }
+}
+
 // ── Sidebar container ────────────────────────────────────
 .admin-toolbar {
     position: fixed;
@@ -44,7 +79,9 @@ $atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: visible;
     backdrop-filter: blur(12px);
 
-    &--expanded {
+    // `&.` raises the specificity: the collapsed rules (opacity 0, width 0) are declared further down with the same
+    // specificity and used to win, so the labels never showed.
+    &.admin-toolbar--expanded {
         width: $atb-sidebar-w-expanded;
         border-radius: $atb-radius;
 
@@ -134,7 +171,7 @@ $atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     gap: 0;
     overflow: visible;
 
-    i[class*="fa-"],
+    .atb-icon,
     .admin-toolbar__btn-icon {
         font-size: 16px;
         width: $atb-sidebar-w;
@@ -256,7 +293,7 @@ $atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     transition: background $atb-transition, color 0.15s;
     margin-top: 2px;
 
-    i[class*="fa-"] {
+    .atb-icon {
         font-size: 11px;
         transition: color 0.15s;
     }
@@ -410,7 +447,7 @@ $atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     transition: background 0.15s, transform 0.1s;
     border: none;
 
-    i[class*="fa-"] {
+    .atb-icon {
         font-size: 12px;
     }
 
@@ -532,7 +569,7 @@ $atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         .admin-toolbar__btn {
             height: 36px;
 
-            i[class*="fa-"],
+            .atb-icon,
             .admin-toolbar__btn-icon {
                 width: 44px;
                 font-size: 14px;
@@ -700,7 +737,7 @@ $atb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     color: $atb-muted;
     background: $atb-bg;
 
-    i.fa-spinner {
+    .atb-icon--spin {
         font-size: 24px;
         color: $atb-accent;
     }

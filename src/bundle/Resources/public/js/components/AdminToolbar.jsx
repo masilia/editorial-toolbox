@@ -4,6 +4,7 @@ import EditModal from './EditModal';
 import ToolboxSidebar from './ToolboxSidebar';
 import { apiUrl } from '../config';
 import { apiFetch, isTrustedMessage } from '../api';
+import Icon from './Icon';
 
 export default function AdminToolbar({ adminBase }) {
     const [expanded, setExpanded] = useState(false);
@@ -122,10 +123,14 @@ export default function AdminToolbar({ adminBase }) {
                 try {
                     const meta = JSON.parse(el.dataset.admin);
                     const rect = el.getBoundingClientRect();
+                    // A full-width block starts at x = 0, i.e. under the toolbar: keep the badge to its right, and
+                    // inside the visible part of a block that starts above the viewport.
+                    const toolbar = document.querySelector('.admin-toolbar');
+                    const minLeft = toolbar ? toolbar.getBoundingClientRect().right + 12 : 0;
                     setActiveBadge({
                         meta,
-                        top: rect.top + window.scrollY + 8,
-                        left: Math.min(rect.left + 70, window.innerWidth - 320),
+                        top: Math.max(rect.top, 0) + window.scrollY + 8,
+                        left: Math.max(minLeft, Math.min(rect.left + 70, window.innerWidth - 320)),
                     });
                 } catch {
                     // ignore parse errors
@@ -157,7 +162,7 @@ export default function AdminToolbar({ adminBase }) {
             <div className={cls}>
                 {/* Brand */}
                 <div className="admin-toolbar__brand">
-                    <i className="fa-solid fa-screwdriver-wrench admin-toolbar__icon" aria-hidden="true"></i>
+                    <Icon name="tools" className="admin-toolbar__icon" />
                     <span className="admin-toolbar__label">Admin</span>
                 </div>
 
@@ -168,7 +173,7 @@ export default function AdminToolbar({ adminBase }) {
                         onClick={() => setOutline((v) => !v)}
                         aria-label={outline ? 'Disable block outlines' : 'Enable block outlines'}
                     >
-                        <i className={`fa-solid ${outline ? 'fa-border-all' : 'fa-vector-square'}`} aria-hidden="true"></i>
+                        <Icon name={outline ? 'grid' : 'outline'} />
                         <span className="admin-toolbar__btn-text">
                             {outline ? 'Outlines ON' : 'Outlines'}
                         </span>
@@ -183,7 +188,7 @@ export default function AdminToolbar({ adminBase }) {
                         onClick={() => setSidebarOpen((v) => !v)}
                         aria-label={sidebarOpen ? 'Hide block palette' : 'Show block palette'}
                     >
-                        <i className="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
+                        <Icon name="blocks" />
                         <span className="admin-toolbar__btn-text">Blocks</span>
                         <span className="atb-tip">{sidebarOpen ? 'Hide blocks' : 'Show blocks'}</span>
                     </button>
@@ -195,7 +200,7 @@ export default function AdminToolbar({ adminBase }) {
                             aria-label="Edit this page on-the-fly"
                             type="button"
                         >
-                            <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                            <Icon name="edit" />
                             <span className="admin-toolbar__btn-text">Edit page</span>
                             <span className="atb-tip">Edit this page on-the-fly</span>
                         </button>
@@ -210,7 +215,7 @@ export default function AdminToolbar({ adminBase }) {
                         rel="noopener noreferrer"
                         aria-label="Open Back-Office dashboard"
                     >
-                        <i className="fa-solid fa-gauge-high" aria-hidden="true"></i>
+                        <Icon name="dashboard" />
                         <span className="admin-toolbar__btn-text">Back-Office</span>
                         <span className="atb-tip">Open Back-Office</span>
                     </a>
@@ -220,7 +225,7 @@ export default function AdminToolbar({ adminBase }) {
                         onClick={() => window.location.reload()}
                         aria-label="Reload the current page"
                     >
-                        <i className="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                        <Icon name="reload" />
                         <span className="admin-toolbar__btn-text">Reload</span>
                         <span className="atb-tip">Reload page</span>
                     </button>
@@ -232,7 +237,7 @@ export default function AdminToolbar({ adminBase }) {
                         href="/logout"
                         aria-label="Log out"
                     >
-                        <i className="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                        <Icon name="logout" />
                         <span className="admin-toolbar__btn-text">Log out</span>
                         <span className="atb-tip">Log out</span>
                     </a>
@@ -241,7 +246,7 @@ export default function AdminToolbar({ adminBase }) {
                 {/* Environment */}
                 <div className="admin-toolbar__env">
                     <span className="admin-toolbar__env-badge">
-                        <i className="fa-solid fa-user-pen" aria-hidden="true" style={{ fontSize: 11 }}></i>
+                        <Icon name="user" style={{ fontSize: 11 }} />
                     </span>
                     <span className="admin-toolbar__env-label">Editor mode</span>
                 </div>
@@ -252,7 +257,7 @@ export default function AdminToolbar({ adminBase }) {
                     onClick={() => setExpanded(v => !v)}
                     aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
                 >
-                    <i className={`fa-solid fa-chevron-${expanded ? 'left' : 'right'}`} aria-hidden="true"></i>
+                    <Icon name={expanded ? 'chevron-left' : 'chevron-right'} />
                     <span className="atb-tip">{expanded ? 'Collapse' : 'Expand sidebar'}</span>
                 </button>
             </div>

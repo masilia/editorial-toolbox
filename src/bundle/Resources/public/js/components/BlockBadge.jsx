@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from './Icon';
 
 export default function BlockBadge({ block, onClose, onEdit }) {
     const { content_id, content_type, remote_id, location_id } = block.meta;
@@ -20,7 +21,7 @@ export default function BlockBadge({ block, onClose, onEdit }) {
                     onClick={(e) => { e.preventDefault(); onEdit(block.meta); }}
                     style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
                 >
-                    <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i> Edit
+                    <Icon name="edit" /> Edit
                 </button>
             </div>
         </div>

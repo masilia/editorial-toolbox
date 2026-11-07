@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Icon from './Icon';
 
 export default function EditModal({ open, url, loading, onClose }) {
     const [fs, setFs] = useState(false);
@@ -38,10 +39,7 @@ export default function EditModal({ open, url, loading, onClose }) {
                             aria-label={fs ? 'Exit fullscreen' : 'Enter fullscreen'}
                             title={fs ? 'Exit fullscreen' : 'Fullscreen'}
                         >
-                            <i
-                                className={`fa-solid ${fs ? 'fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'}`}
-                                aria-hidden="true"
-                            ></i>
+                            <Icon name={fs ? 'compress' : 'expand'} />
                         </button>
                         <button
                             className="atb-modal-close"
@@ -55,7 +53,7 @@ export default function EditModal({ open, url, loading, onClose }) {
                 <div className="atb-modal-body">
                     {loading ? (
                         <div className="atb-modal-loader">
-                            <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                            <Icon name="spinner" spin />
                             <span>Preparing edit draft...</span>
                         </div>
                     ) : (
