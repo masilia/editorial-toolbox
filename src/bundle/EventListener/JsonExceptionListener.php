@@ -7,6 +7,7 @@ namespace Masilia\Bundle\EditorialToolbox\EventListener;
 use Ibexa\Contracts\Core\Repository\Exceptions\InvalidArgumentException as IbexaInvalidArgumentException;
 use Ibexa\Contracts\Core\Repository\Exceptions\NotFoundException;
 use Ibexa\Contracts\Core\Repository\Exceptions\UnauthorizedException;
+use Masilia\Contracts\EditorialToolbox\Exception\TranslationMissingException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,18 @@ class JsonExceptionListener implements EventSubscriberInterface
         }
 
         $exception = $event->getThrowable();
+
+        if ($exception instanceof TranslationMissingException) {
+            // Not an error to report but a question for the editor: the toolbar shows the choices.
+            $event->setResponse(new JsonResponse([
+                'error' => $exception->getMessage(),
+                'code' => 'translation_missing',
+                'language' => $exception->getLanguageCode(),
+                'available' => $exception->getAvailableLanguages(),
+            ], Response::HTTP_CONFLICT));
+
+            return;
+        }
 
         $status = match (true) {
             $exception instanceof UnauthorizedException => Response::HTTP_FORBIDDEN,

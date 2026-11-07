@@ -35,12 +35,28 @@ class AdminMetaBuilder implements AdminMetaBuilderInterface
             'location_id' => $content->contentInfo->mainLocationId,
             'dashboard_url' => $dashboardUrl,
             'current_language' => $this->displayedLanguage($content),
-        ];
+        ] + $this->translationState($content);
 
         $event = new AdminMetaBuildEvent($content, $meta);
         $this->eventDispatcher->dispatch($event);
 
         return $event->getMeta();
+    }
+
+    /**
+     * `site_language` is the language of the siteaccess; `translation_missing` is true when the content has no text in it and is
+     * therefore displayed through the fallback: the toolbar then asks the editor what to do instead of editing blindly.
+     *
+     * @return array{site_language: string|null, translation_missing: bool}
+     */
+    private function translationState(Content $content): array
+    {
+        $siteLanguage = $this->configResolver->getParameter('languages')[0] ?? null;
+
+        return [
+            'site_language' => $siteLanguage,
+            'translation_missing' => $siteLanguage !== null && !\in_array($siteLanguage, $content->versionInfo->languageCodes, true),
+        ];
     }
 
     /**

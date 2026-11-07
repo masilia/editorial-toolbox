@@ -33,7 +33,22 @@ final class AdminMetaBuilderTest extends TestCase
             'location_id' => 62,
             'dashboard_url' => 'http://admin.example/dashboard',
             'current_language' => 'fre-FR',
+            'site_language' => 'fre-FR',
+            'translation_missing' => false,
         ], $meta);
+    }
+
+    public function testFlagsAContentThatHasNoTextInTheSiteLanguage(): void
+    {
+        $urls = $this->createMock(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturn('#');
+
+        // The siteaccess language is French; the content only exists in English and is shown through the fallback.
+        $meta = $this->builder($urls, new EventDispatcher())->build($this->content(['eng-GB']));
+
+        self::assertSame('fre-FR', $meta['site_language']);
+        self::assertTrue($meta['translation_missing']);
+        self::assertSame('eng-GB', $meta['current_language']);
     }
 
     public function testListenersCanExtendTheMeta(): void

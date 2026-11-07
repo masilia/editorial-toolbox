@@ -88,6 +88,7 @@ class ToolboxExtension extends AbstractExtension
             'csrf' => $generate('masilia_editorial_toolbox.csrf'),
             'draftEdit' => $generate('masilia_editorial_toolbox.draft.edit', $content + $location),
             'draftDiscard' => $generate('masilia_editorial_toolbox.draft.discard', $content),
+            'translationOptions' => $generate('masilia_editorial_toolbox.translation.options', $content),
             'blocks' => $generate('masilia_editorial_toolbox.blocks.list', $location),
             'blocksRelation' => $generate('masilia_editorial_toolbox.blocks.relation', $location),
             'blocksOrder' => $generate('masilia_editorial_toolbox.blocks.reorder', $location),

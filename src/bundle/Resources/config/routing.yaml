@@ -13,6 +13,12 @@ masilia_editorial_toolbox.draft.edit:
     methods: [POST]
     requirements: { contentId: '\d+', locationId: '\d+' }
 
+masilia_editorial_toolbox.translation.options:
+    path: /translation/options/{contentId}/{languageCode}
+    controller: Masilia\Bundle\EditorialToolbox\Controller\TranslationController::options
+    methods: [GET]
+    requirements: { contentId: '\d+' }
+
 masilia_editorial_toolbox.draft.discard:
     path: /in-context/discard/{contentId}/{languageCode}
     controller: Masilia\Bundle\EditorialToolbox\Controller\DraftController::discard

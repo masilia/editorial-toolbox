@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import BlockBadge from './BlockBadge';
 import EditModal from './EditModal';
 import ToolboxSidebar from './ToolboxSidebar';
+import TranslationChoice from './TranslationChoice';
 import { apiUrl } from '../config';
 import { apiFetch, isTrustedMessage } from '../api';
 import Icon from './Icon';
@@ -20,6 +21,9 @@ export default function AdminToolbar({ adminBase }) {
     const [iframeUrl, setIframeUrl] = useState(null);
     const [loading, setLoading] = useState(false);
     const [draftInfo, setDraftInfo] = useState(null);
+
+    // Meta of the content whose translation is missing, while the editor chooses what to do about it
+    const [translationPrompt, setTranslationPrompt] = useState(null);
 
     useEffect(() => {
         const pageEl = document.querySelector('main#main-content[data-admin]');
@@ -62,31 +66,63 @@ export default function AdminToolbar({ adminBase }) {
         }
     }, [draftInfo]);
 
-    const handleEditClick = useCallback((meta) => {
-        const { content_id, location_id , current_language} = meta;
-        const htmlLang = current_language || document.documentElement.lang || 'eng-GB';
+    // Opens the edit form. `choice` is the editor's answer to the "no translation yet" question (see TranslationChoice): without
+    // it the text that exists is edited, with it the missing translation of the site language is created first.
+    const startEdit = useCallback(async (meta, choice = null) => {
+        const { content_id, location_id } = meta;
+        const language = choice
+            ? meta.site_language
+            : (meta.current_language || document.documentElement.lang || 'eng-GB');
 
         setLoading(true);
         setModalOpen(true);
         setActiveBadge(null); // Hide badge when editor opens
 
-        apiFetch(apiUrl('draftEdit', { contentId: content_id, languageCode: htmlLang, locationId: location_id }), { method: 'POST' })
-            .then((res) => {
-                if (!res.ok) throw new Error('Error creating draft');
-                return res.json();
-            })
-            .then((data) => {
-                setIframeUrl(data.editUrl);
-                setDraftInfo({ contentId: content_id, language: htmlLang });
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error(err);
-                alert('Could not initialize edit draft. Please try again or use the Back-Office.');
+        try {
+            const options = { method: 'POST' };
+            if (choice) {
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify({ translation: choice });
+            }
+
+            const res = await apiFetch(apiUrl('draftEdit', { contentId: content_id, languageCode: language, locationId: location_id }), options);
+            const data = await res.json().catch(() => ({}));
+
+            if (res.status === 409 && data.code === 'translation_missing') {
+                // The server knows better than the page: ask the editor instead of failing.
                 setLoading(false);
                 setModalOpen(false);
-            });
+                setTranslationPrompt({ ...meta, translation_missing: true, site_language: data.language });
+                return;
+            }
+            if (!res.ok) throw new Error(data.error || 'Error creating draft');
+
+            setIframeUrl(data.editUrl);
+            setDraftInfo({ contentId: content_id, language });
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+            alert(`Could not initialize the edit draft: ${err.message}\nPlease try again or use the Back-Office.`);
+            setLoading(false);
+            setModalOpen(false);
+        }
     }, []);
+
+    const handleEditClick = useCallback((meta) => {
+        setActiveBadge(null);
+
+        if (meta.translation_missing) {
+            setTranslationPrompt(meta); // nothing is created before the editor decides
+        } else {
+            startEdit(meta);
+        }
+    }, [startEdit]);
+
+    const handleTranslationChoice = useCallback((choice) => {
+        const meta = translationPrompt;
+        setTranslationPrompt(null);
+        if (meta) startEdit(meta, choice);
+    }, [translationPrompt, startEdit]);
 
     const getBlocks = useCallback(() => {
         return Array.from(document.querySelectorAll('[data-admin]'));
@@ -267,6 +303,14 @@ export default function AdminToolbar({ adminBase }) {
                     block={activeBadge}
                     onClose={() => setActiveBadge(null)}
                     onEdit={handleEditClick}
+                />
+            )}
+
+            {translationPrompt && (
+                <TranslationChoice
+                    meta={translationPrompt}
+                    onChoose={handleTranslationChoice}
+                    onCancel={() => setTranslationPrompt(null)}
                 />
             )}
 

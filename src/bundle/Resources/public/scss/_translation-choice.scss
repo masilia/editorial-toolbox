@@ -1,0 +1,191 @@
+// ============================================================
+// "No translation yet" dialog (components/TranslationChoice.jsx)
+// Same dark look as the in-context editor modal. The host theme's own rules for buttons, selects, headings and paragraphs
+// must not leak in, hence the explicit resets (box-sizing is already isolated under .js-island-admin-toolbar).
+// ============================================================
+
+$tr-bg: #1b1f3b;
+$tr-card: #252a4a;
+$tr-card-hover: #2d3358;
+$tr-text: #c4c9d4;
+$tr-bright: #ffffff;
+$tr-muted: #8b93a7;
+$tr-accent: #ae1164;
+$tr-accent-hover: #c81a73;
+$tr-danger: #f87171;
+$tr-border: rgba(255, 255, 255, 0.1);
+$tr-font: 'Inter', 'Source Sans 3', system-ui, sans-serif;
+
+.atb-tr {
+    position: fixed;
+    inset: 0;
+    z-index: 100002; // above the editor modal (100000) and its tooltip layer (100001)
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(11, 15, 30, 0.6);
+    backdrop-filter: blur(8px);
+    font-family: $tr-font;
+    font-size: 14px;
+    line-height: 1.45;
+    color: $tr-text;
+    text-align: left;
+
+    &__dialog {
+        width: 100%;
+        max-width: 520px;
+        max-height: 92vh;
+        overflow-y: auto;
+        padding: 24px;
+        background: $tr-bg;
+        border: 1px solid $tr-border;
+        border-radius: 16px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    &__title {
+        margin: 0 0 8px;
+        padding: 0;
+        font: 600 18px/1.3 $tr-font;
+        color: $tr-bright;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    &__text {
+        margin: 0 0 16px;
+        padding: 0;
+        font: 400 14px/1.5 $tr-font;
+        color: $tr-text;
+
+        &--error { color: $tr-danger; }
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 0 0 14px;
+        font: 500 12px/1.3 $tr-font;
+        color: $tr-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    select {
+        width: 100%;
+        height: 38px;
+        margin: 0;
+        padding: 0 10px;
+        font: 400 14px/1 $tr-font;
+        color: $tr-bright;
+        background: $tr-card;
+        border: 1px solid $tr-border;
+        border-radius: 8px;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    // The choices (and the provider block, which is not a single button because it holds a select)
+    &__option {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        width: 100%;
+        margin: 0 0 10px;
+        padding: 14px 16px;
+        font: 400 13px/1.4 $tr-font;
+        color: $tr-text;
+        text-align: left;
+        background: $tr-card;
+        border: 1px solid $tr-border;
+        border-radius: 12px;
+        cursor: pointer;
+        text-transform: none;
+        letter-spacing: 0;
+        transition: background 0.15s, border-color 0.15s;
+
+        strong { font: 600 14px/1.35 $tr-font; color: $tr-bright; }
+        span { color: $tr-muted; }
+
+        &:hover,
+        &:focus-visible {
+            background: $tr-card-hover;
+            border-color: rgba(174, 17, 100, 0.65);
+            outline: none;
+        }
+
+        // Not a button (it holds a select and its own button): no hover highlight for the block as a whole
+        &--provider {
+            cursor: default;
+
+            &:hover {
+                background: $tr-card;
+                border-color: $tr-border;
+            }
+        }
+    }
+
+    &__row {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        margin-top: 8px;
+
+        select { flex: 1; min-width: 0; }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    &__btn {
+        flex-shrink: 0;
+        height: 38px;
+        margin: 0;
+        padding: 0 18px;
+        font: 600 13px/1 $tr-font;
+        color: $tr-bright;
+        background: $tr-accent;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        text-transform: none;
+        letter-spacing: 0;
+        transition: background 0.15s;
+
+        &:hover:not(:disabled) { background: $tr-accent-hover; }
+        &:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        &--ghost {
+            background: transparent;
+            color: $tr-text;
+            border-color: $tr-border;
+
+            &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+        }
+    }
+
+    &__link {
+        margin: 0;
+        padding: 0;
+        font: 500 13px/1.3 $tr-font;
+        color: $tr-text;
+        text-align: left;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-transform: none;
+        letter-spacing: 0;
+
+        &:hover { color: $tr-bright; }
+    }
+}

@@ -3,6 +3,7 @@ import { mountIsland } from './mount';
 
 import '../scss/_admin-toolbar.scss';
 import '../scss/_toolbox-sidebar.scss';
+import '../scss/_translation-choice.scss';
 
 const mountPoint = document.querySelector('.js-island-admin-toolbar');
 

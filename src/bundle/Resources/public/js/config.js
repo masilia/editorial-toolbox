@@ -6,6 +6,7 @@ const DEFAULT_ENDPOINTS = {
     csrf: '/admin/api/csrf-token',
     draftEdit: '/admin/api/in-context/edit/{contentId}/{languageCode}/{locationId}',
     draftDiscard: '/admin/api/in-context/discard/{contentId}/{languageCode}',
+    translationOptions: '/admin/api/translation/options/{contentId}/{languageCode}',
     blocks: '/admin/api/page/{locationId}/blocks',
     blocksRelation: '/admin/api/page/{locationId}/blocks/relation',
     blocksOrder: '/admin/api/page/{locationId}/blocks/order',

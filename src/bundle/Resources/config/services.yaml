@@ -17,6 +17,14 @@ services:
     Masilia\Contracts\EditorialToolbox\Draft\InContextDraftManagerInterface:
         alias: Masilia\EditorialToolbox\Draft\InContextDraftManager
 
+    # The adapter's dependencies (Ibexa automated translation) are optional: without the package, or without a configured
+    # provider, it simply offers none. Point the alias at NullTranslationProvider, or at your own implementation, to change that.
+    Masilia\Contracts\EditorialToolbox\Translation\TranslationProviderInterface:
+        alias: Masilia\EditorialToolbox\Translation\AutomatedTranslationProvider
+
+    Masilia\Contracts\EditorialToolbox\Translation\TranslationOptionsServiceInterface:
+        alias: Masilia\EditorialToolbox\Translation\TranslationOptionsService
+
     Masilia\Bundle\EditorialToolbox\Controller\:
         resource: '../../Controller/*'
         public: true

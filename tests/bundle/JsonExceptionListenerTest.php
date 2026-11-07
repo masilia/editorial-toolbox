@@ -7,6 +7,7 @@ namespace Masilia\Tests\Bundle\EditorialToolbox;
 use Ibexa\Core\Base\Exceptions\NotFoundException;
 use Ibexa\Core\Base\Exceptions\UnauthorizedException;
 use Masilia\Bundle\EditorialToolbox\EventListener\JsonExceptionListener;
+use Masilia\Contracts\EditorialToolbox\Exception\TranslationMissingException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -38,6 +39,19 @@ final class JsonExceptionListenerTest extends TestCase
         yield 'bad json' => [new \JsonException('Syntax error'), 400];
         yield 'invalid argument' => [new \InvalidArgumentException('nope'), 400];
         yield 'anything else' => [new \RuntimeException('boom'), 500];
+    }
+
+    public function testAMissingTranslationIsAQuestionForTheToolbarNotAnError(): void
+    {
+        $event = $this->event('masilia_editorial_toolbox.draft.edit', new TranslationMissingException(239, 'fre-FR', ['eng-GB']));
+
+        (new JsonExceptionListener())->onException($event);
+
+        self::assertSame(409, $event->getResponse()->getStatusCode());
+        $body = json_decode($event->getResponse()->getContent(), true);
+        self::assertSame('translation_missing', $body['code']);
+        self::assertSame('fre-FR', $body['language']);
+        self::assertSame(['eng-GB'], $body['available']);
     }
 
     public function testIgnoresOtherRoutes(): void
