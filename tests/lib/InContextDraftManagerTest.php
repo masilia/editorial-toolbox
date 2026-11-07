@@ -71,6 +71,19 @@ final class InContextDraftManagerTest extends TestCase
         self::assertSame(7, $this->manager->getOrCreateDraft(62, 'eng-GB'));
     }
 
+    public function testRefusesToCreateABlankTranslation(): void
+    {
+        // The content only exists in English; the siteaccess language is French (it is shown through the fallback).
+        $this->contentService->method('loadVersions')->willReturn([]);
+        $this->contentService->method('loadContent')->willReturn(new CoreContent(['versionInfo' => $this->draft(1, 1, 'eng-GB')]));
+        $this->contentService->expects(self::never())->method('createContentDraft');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/no "fre-FR" translation.*exists in: eng-GB/');
+
+        $this->manager->getOrCreateDraft(62, 'fre-FR');
+    }
+
     public function testDiscardDeletesOnlyTheCurrentUsersDraftForThatLanguage(): void
     {
         $mine = $this->draft(5, self::ME, 'eng-GB');
@@ -87,6 +100,7 @@ final class InContextDraftManagerTest extends TestCase
             'versionNo' => $versionNo,
             'creatorId' => $creatorId,
             'initialLanguageCode' => $language,
+            'languageCodes' => ['eng-GB'],
             'status' => VersionInfo::STATUS_DRAFT,
         ]);
     }

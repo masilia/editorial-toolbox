@@ -29,6 +29,19 @@ class InContextDraftManager implements InContextDraftManagerInterface
         }
 
         $content = $this->contentService->loadContent($contentId, [$languageCode]);
+
+        // Ibexa would happily create a draft in a language the content does not have: a blank translation, shown in the editor
+        // as an empty form that can be published over what the page displays. This tool edits existing text only.
+        $languageCodes = $content->getVersionInfo()->languageCodes;
+        if (!\in_array($languageCode, $languageCodes, true)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Content %d has no "%s" translation (it exists in: %s). The in-context editor edits existing text, it does not create translations.',
+                $contentId,
+                $languageCode,
+                implode(', ', $languageCodes)
+            ));
+        }
+
         $draft = $this->contentService->createContentDraft(
             $contentInfo,
             $content->getVersionInfo(),

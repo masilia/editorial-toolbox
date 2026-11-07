@@ -63,7 +63,10 @@ final class AdminMetaBuilderTest extends TestCase
         return new AdminMetaBuilder($urls, $config, $dispatcher);
     }
 
-    private function content(): CoreContent
+    /**
+     * @param string[] $availableLanguages
+     */
+    private function content(array $availableLanguages = ['eng-GB', 'fre-FR']): CoreContent
     {
         $contentType = $this->createMock(ContentType::class);
         $contentType->method('getName')->willReturn('Home Page');
@@ -71,8 +74,39 @@ final class AdminMetaBuilderTest extends TestCase
         $contentInfo = new ContentInfo(['id' => 62, 'remoteId' => 'home', 'mainLocationId' => 62, 'mainLanguageCode' => 'eng-GB']);
 
         return new CoreContent([
-            'versionInfo' => new CoreVersionInfo(['contentInfo' => $contentInfo, 'initialLanguageCode' => 'eng-GB']),
+            'versionInfo' => new CoreVersionInfo([
+                'contentInfo' => $contentInfo,
+                'initialLanguageCode' => 'eng-GB',
+                'languageCodes' => $availableLanguages,
+            ]),
             'contentType' => $contentType,
         ]);
+    }
+
+    /**
+     * @dataProvider displayedLanguages
+     *
+     * @param string[] $availableLanguages
+     */
+    public function testTheLanguageIsTheOneTheContentIsDisplayedIn(array $availableLanguages, string $expected): void
+    {
+        // The siteaccess languages are ['fre-FR', 'eng-GB'], see builder().
+        $urls = $this->createMock(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturn('#');
+
+        $meta = $this->builder($urls, new EventDispatcher())->build($this->content($availableLanguages));
+
+        self::assertSame($expected, $meta['current_language']);
+    }
+
+    /**
+     * @return iterable<string, array{string[], string}>
+     */
+    public static function displayedLanguages(): iterable
+    {
+        yield 'translated: the siteaccess language' => [['eng-GB', 'fre-FR'], 'fre-FR'];
+        yield 'never translated: shown through the fallback, so edit that text' => [['eng-GB'], 'eng-GB'];
+        yield 'only a language of the siteaccess' => [['fre-FR'], 'fre-FR'];
+        yield 'none of the siteaccess languages: the main language' => [['ger-DE'], 'eng-GB'];
     }
 }
