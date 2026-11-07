@@ -9,15 +9,24 @@ export default function EditModal({ open, url, loading, onClose }) {
     // The iframe's COTF template listens for `atb:fs` and toggles body class.
     useEffect(() => {
         const iframe = iframeRef.current;
-        if (!iframe || !iframe.contentWindow) return;
+        if (!iframe || !url) return;
 
-        let targetOrigin = '*';
-        try { targetOrigin = new URL(iframe.src).origin; } catch {}
+        let targetOrigin;
+        try { targetOrigin = new URL(iframe.src).origin; } catch { return; }
 
+        // Post only to the page we opened. Until it has loaded the iframe's window is the initial blank one, which belongs to
+        // OUR origin, and the browser refuses ("The target origin provided ... does not match the recipient window's origin");
+        // so does a frame that ended up on another page. A window of another origin than ours cannot be read: that is the
+        // admin page (on its own host), so post to it. A readable one is ours or blank: wait for the load event.
         const send = () => {
-            try {
-                iframe.contentWindow.postMessage({ event: 'atb:fs', fullscreen: fs }, targetOrigin);
-            } catch {}
+            const win = iframe.contentWindow;
+            if (!win) return;
+
+            let frameOrigin = null;
+            try { frameOrigin = win.location.origin; } catch { /* cross-origin: the admin page */ }
+            if (frameOrigin !== null && frameOrigin !== targetOrigin) return;
+
+            win.postMessage({ event: 'atb:fs', fullscreen: fs }, targetOrigin);
         };
 
         send();
